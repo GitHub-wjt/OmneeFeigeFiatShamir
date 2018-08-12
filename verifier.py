@@ -54,13 +54,16 @@ class ffs_verifier:
         x=int(sock.readline())
         print "Prover commited to: "+str(x)
         b=[None]*self.k
+        
         for i in range(0,self.k):
             b[i] = (random.randint(0,1)==1)
             sock.write(str(b[i])+" ")
         sock.write("\n")
         sock.flush()
+
         y=int(sock.readline())
-        expected_x=square_ZnZ(y,self.n)
+        #expected_x=square_ZnZ(y,self.n)
+        expected_x= y**2
         for i in range(0,self.k):
             if b[i]:
                 expected_x*=self.pub_key[i]

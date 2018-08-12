@@ -6,6 +6,7 @@ Created on Dec 17, 2014
 
 import random
 import socket
+from fractions import gcd
 from mod_operations import coin_flip,inverse,square_ZnZ
 
 def str_to_bool(string):
@@ -29,22 +30,22 @@ class ffs_prover:
         self.p=[None]*k
         for i in range(0,k):
             self.s[i]= random.randint(0,n-1)
-            self.s[i]= 3
+            self.s[i]= 631357172
 
             # My debug
-            coinFlip = coin_flip()
+            coinFlip = 1
             print "  #Coin flip: " + str(coinFlip)
 
             # Private key s_i
             print "  #s_i: " + str(self.s[i])
-            print "si**2: " + str(self.s[i]**2)
+            #print "si**2: " + str(self.s[i]**2)
 
             si2_modn = self.s[i]**2 % n
             print "  #s^2 (mod n): " +str(si2_modn)
 
             #p = (coinFlip/(self.s[i]**2)) %n
-            p = (coinFlip*si2_modn)
-            print "  #my p: " + str(p)
+            #p = (coinFlip*si2_modn)
+            #print "  #my p: " + str(p)
 
             sqrZ = square_ZnZ(self.s[i], n)
             print "  #Square znz: " + str(sqrZ)
@@ -95,6 +96,7 @@ class ffs_prover:
             print "Verifier asked for "+str(self.t)+" challenges"
 
     #Commit to R as described in Feige-Fiat-Shamir
+    #First step - calculate R
     def initiate_challenge(self,mysocket):
         mysocket.write("COMMIT\n")
         mysocket.flush()
@@ -103,15 +105,15 @@ class ffs_prover:
         b=[]
         if response == "OK COMMIT\n":
             r=random.randint(0,self.n-1)
-            tt = str((coin_flip()*square_ZnZ(r, self.n)) % self.n) + " "
-            print "r: " + str(r)
-            print "x: " + str(tt)
-            print "new x: " + str((r*r) % self.n)
-            mysocket.write(str((r*r) % self.n))
+            print r
+            #x = str((coin_flip()*square_ZnZ(r, self.n)) % self.n) + " "
+            xSA = str((r*r) % self.n)
+            #xSA = 998499513
+
+            mysocket.write(xSA)
             mysocket.write("\n")
             mysocket.flush()
             b=map(str_to_bool,mysocket.readline().split())
-            print b
             return r,b
         else:
             mysocket.write("DIE\n")
